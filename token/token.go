@@ -1,27 +1,23 @@
-// Idiomatic way to implement enumerated type
-// https://yourbasic.org/golang/iota/
-
 package token
 
+// TypeInt a lexer type.
 type TypeInt int
 
 const (
-	Illegal TypeInt = iota
-	EOF
-	OpeningParenthesis
-	ClosingParenthesis
-	Plus
-	Minus
-	Divide
-	Asterisk
+	OPE TypeInt = iota
+	// Illegal TypeInt = iota
+	// EOF
+	// OpeningParenthesis
+	// ClosingParenthesis
+	// Plus
+	// Minus
+	// Divide
+	// Asterisk
 	Number
 )
 
+// Token define a token.
 type Token struct {
 	Type    TypeInt
 	Literal string
-}
-
-func NewToken(t TypeInt, l string) Token {
-	return Token{Type: t, Literal: l}
 }
