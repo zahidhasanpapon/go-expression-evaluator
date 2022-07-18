@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/zahidhasanpapon/go-expression-evaluator/token"
@@ -11,7 +10,7 @@ import (
 // Tokenize performs a lexical analysis.
 func Tokenize(s string) []token.Token {
 	runes := []rune(s)
-	tokens := []token.Token{}
+	tokensQueue := []token.Token{}
 
 	for len(runes) > 0 {
 		// Skip white space
@@ -21,8 +20,8 @@ func Tokenize(s string) []token.Token {
 			break
 		}
 
-		r, shifted := utils.ShiftRune(runes)
-		runes = shifted
+		r, shiftedRune := utils.ShiftRune(runes)
+		runes = shiftedRune
 
 		if utils.IsNumber(r) {
 			s, readed := utils.ReadWhile(runes, utils.IsNumber)
@@ -33,31 +32,37 @@ func Tokenize(s string) []token.Token {
 				Literal: string(r) + s,
 			}
 
-			tokens = append(tokens, token)
+			tokensQueue = append(tokensQueue, token)
 		} else if utils.IsOperator(string(r)) {
+
 			token := token.Token{
 				Type:    token.OPE,
 				Literal: string(r),
 			}
-			tokens = append(tokens, token)
+
+			tokensQueue = append(tokensQueue, token)
 		} else if string(r) == "." {
-			currToken := tokens[len(tokens)-1]
-			tokens = tokens[:len(tokens)-1]
+
+			currToken := tokensQueue[len(tokensQueue)-1]
+			tokensQueue = tokensQueue[:len(tokensQueue)-1]
+
 			currToken.Literal += string(r)
-			r, shifted := utils.ShiftRune(runes)
-			runes = shifted
+
+			r, shiftedRune := utils.ShiftRune(runes)
+			runes = shiftedRune
+
 			if utils.IsNumber(r) {
 				s, readed := utils.ReadWhile(runes, utils.IsNumber)
 
 				runes = readed
 				currToken.Literal = currToken.Literal + s + string(r)
-				fmt.Println("curr token", currToken)
-				tokens = append(tokens, currToken)
+
+				tokensQueue = append(tokensQueue, currToken)
 			}
-			tokens = append(tokens, currToken)
+			tokensQueue = append(tokensQueue, currToken)
 		} else {
 			log.Fatalf("Char %s not allowed", string(r))
 		}
 	}
-	return tokens
+	return tokensQueue
 }
