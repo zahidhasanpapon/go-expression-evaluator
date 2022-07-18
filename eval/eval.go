@@ -19,31 +19,31 @@ func Calculate(tokens []token.Token) float64 {
 		tokens = shifted
 
 		if t.Type == token.Number {
-			intValue, err := strconv.ParseFloat(t.Literal, 64)
+			value, err := strconv.ParseFloat(t.Literal, 64)
 			if err != nil {
 				log.Fatalf("cast error %s", t.Literal)
 			}
-			stack = append(stack, intValue)
+			stack = append(stack, value)
 		} else {
 			// Case of OPE, get operands
-			l, lPoped := utils.Pop(stack)
-			stack = lPoped
+			last, lastPoped := utils.Pop(stack)
+			stack = lastPoped
 
-			r, rPoped := utils.Pop(stack)
-			stack = rPoped
+			secondLast, secondLastPoped := utils.Pop(stack)
+			stack = secondLastPoped
 
 			switch t.Literal {
 			case "+":
-				calc := r + l
+				calc := secondLast + last
 				stack = append(stack, calc)
 			case "-":
-				calc := r - l
+				calc := secondLast - last
 				stack = append(stack, calc)
 			case "*":
-				calc := r * l
+				calc := secondLast * last
 				stack = append(stack, calc)
 			case "/":
-				calc := r / l
+				calc := secondLast / last
 				stack = append(stack, calc)
 			}
 		}

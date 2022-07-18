@@ -14,72 +14,67 @@ var PrecedenceOperators = map[string]int{
 	"*": 30,
 }
 
-// PostFixExpression return postfix expression
+// PostfixExpression return postfix expression
 func PostfixExpression(infix []token.Token) []token.Token {
-	opeStack := []token.Token{}
-	tokens := []token.Token{}
+	operatorStack := []token.Token{}
+	tokensQueue := []token.Token{}
 
 	for len(infix) > 0 {
-		t, shifted := utils.ShiftToken(infix)
-		infix = shifted
+		t, shiftedRune := utils.ShiftToken(infix)
+		infix = shiftedRune
 
 		tokenPrecedence := PrecedenceOperators[t.Literal]
 
-		// Get last OPE from stack
+		// Get last operator from stack
 		stackPrecedence := 0
-		if len(opeStack) > 0 {
-			stackPrecedence = PrecedenceOperators[opeStack[len(opeStack)-1].Literal]
+		if len(operatorStack) > 0 {
+			stackPrecedence = PrecedenceOperators[operatorStack[len(operatorStack)-1].Literal]
 		}
 
 		if t.Type == token.Number {
-			// Case of NUM
-			tokens = append(tokens, t)
-		} else if t.Type == token.OPE && len(opeStack) == 0 {
-			// Case First OPE in stack
-			opeStack = append(opeStack, t)
+			tokensQueue = append(tokensQueue, t)
+		} else if t.Type == token.OPE && len(operatorStack) == 0 {
+			operatorStack = append(operatorStack, t)
 		} else if t.Type == token.OPE && tokenPrecedence > stackPrecedence {
-			// Case of token predecende is bigger of stack precedence
-			opeStack = append(opeStack, t)
+			operatorStack = append(operatorStack, t)
 		} else if t.Type == token.OPE && t.Literal == "(" {
-			// Case of open bracket
-			opeStack = append(opeStack, t)
+			operatorStack = append(operatorStack, t)
 		} else if t.Type == token.OPE && t.Literal == ")" {
-			// Case of closed bracket
 			var ope token.Token
 
-			ope, poped := utils.PopToken(opeStack)
-			opeStack = poped
-			for ope.Literal != "(" && len(opeStack) != 0 {
-				tokens = append(tokens, ope)
+			ope, poped := utils.PopToken(operatorStack)
+			operatorStack = poped
+			for ope.Literal != "(" && len(operatorStack) != 0 {
+				tokensQueue = append(tokensQueue, ope)
 
-				ope, poped = utils.PopToken(opeStack)
-				opeStack = poped
+				ope, poped = utils.PopToken(operatorStack)
+				operatorStack = poped
 			}
 		} else {
 			// Case of stack predence is bigger of token precedence
 			for tokenPrecedence <= stackPrecedence {
-				token, poped := utils.PopToken(opeStack)
-				opeStack = poped
+				token, poped := utils.PopToken(operatorStack)
+				operatorStack = poped
 
-				tokens = append(tokens, token)
+				tokensQueue = append(tokensQueue, token)
 
 				stackPrecedence = 0
-				if len(opeStack) > 0 {
-					stackPrecedence = PrecedenceOperators[opeStack[len(opeStack)-1].Literal]
+				if len(operatorStack) > 0 {
+					stackPrecedence = PrecedenceOperators[operatorStack[len(operatorStack)-1].Literal]
 				}
 			}
 
-			opeStack = append(opeStack, t)
+			operatorStack = append(operatorStack, t)
 		}
 	}
 
-	// Add ope stack
-	for len(opeStack) > 0 {
-		token, poped := utils.PopToken(opeStack)
-		opeStack = poped
+	// Add remaing operators from stack to queue
+	for len(operatorStack) > 0 {
+		token, poped := utils.PopToken(operatorStack)
+		operatorStack = poped
 
-		tokens = append(tokens, token)
+		tokensQueue = append(tokensQueue, token)
 	}
 
-	return tokens
+	return tokensQueue
 }

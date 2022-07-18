@@ -10,7 +10,7 @@ import (
 // Tokenize performs a lexical analysis.
 func Tokenize(s string) []token.Token {
 	runes := []rune(s)
-	tokensQueue := []token.Token{}
+	tokens := []token.Token{}
 
 	for len(runes) > 0 {
 		// Skip white space
@@ -32,7 +32,7 @@ func Tokenize(s string) []token.Token {
 				Literal: string(r) + s,
 			}
 
-			tokensQueue = append(tokensQueue, token)
+			tokens = append(tokens, token)
 		} else if utils.IsOperator(string(r)) {
 
 			token := token.Token{
@@ -40,11 +40,11 @@ func Tokenize(s string) []token.Token {
 				Literal: string(r),
 			}
 
-			tokensQueue = append(tokensQueue, token)
+			tokens = append(tokens, token)
 		} else if string(r) == "." {
 
-			currToken := tokensQueue[len(tokensQueue)-1]
-			tokensQueue = tokensQueue[:len(tokensQueue)-1]
+			currToken := tokens[len(tokens)-1]
+			tokens = tokens[:len(tokens)-1]
 
 			currToken.Literal += string(r)
 
@@ -57,12 +57,13 @@ func Tokenize(s string) []token.Token {
 				runes = readed
 				currToken.Literal = currToken.Literal + s + string(r)
 
-				tokensQueue = append(tokensQueue, currToken)
+				tokens = append(tokens, currToken)
 			}
-			tokensQueue = append(tokensQueue, currToken)
+			tokens = append(tokens, currToken)
 		} else {
 			log.Fatalf("Char %s not allowed", string(r))
 		}
 	}
-	return tokensQueue
+
+	return tokens
 }
