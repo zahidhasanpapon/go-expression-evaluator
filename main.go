@@ -18,9 +18,9 @@ func main() {
 		input, _ := reader.ReadString('\n')
 
 		infix := lexer.Tokenize(input)
-		fmt.Println(infix)
+		// fmt.Println(infix)
 		tokens := parser.PostfixExpression(infix)
-		fmt.Println(tokens)
+		// fmt.Println(tokens)
 		reuslt := eval.Calculate(tokens)
 
 		fmt.Println(reuslt)
